@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://react-anchored-layer.nipesolutions.com/sitemap.xml

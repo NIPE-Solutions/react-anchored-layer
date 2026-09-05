@@ -1,0 +1,31 @@
+name: Bug report
+description: Report a reproducible Anchored Layer problem.
+body:
+  - type: markdown
+    attributes:
+      value: Do not include secrets or security vulnerabilities. Use private vulnerability reporting for security issues.
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include the anchor, portal container, scrolling ancestors, and relevant styles.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Browser, React version, and rendering environment
+    validations:
+      required: true
