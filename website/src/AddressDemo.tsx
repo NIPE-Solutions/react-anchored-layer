@@ -17,11 +17,18 @@ export function AddressDemo() {
   return (
     <div
       className="coordinate-workspace"
-      aria-label="Address search demonstration"
+      aria-label="Anchored layer playground"
+      role="region"
     >
       <div className="workspace-toolbar">
-        <span>modal / address search</span>
-        <span className="status">live geometry</span>
+        <span>clipped modal / address search</span>
+        <span className="status">positioning live</span>
+      </div>
+      <div className="geometry-label geometry-offset" aria-hidden="true">
+        7px offset
+      </div>
+      <div className="geometry-label geometry-anchor" aria-hidden="true">
+        anchor
       </div>
       <div className="modal-clip">
         <div className="modal-scroll">
@@ -78,6 +85,9 @@ export function AddressDemo() {
         </div>
       </div>
       <div className="portal-boundary" ref={setPortalRoot} />
+      <div className="portal-relationship" aria-hidden="true">
+        <span>portal target: modal root</span>
+      </div>
       <div className="workspace-controls" aria-label="Demo controls">
         <button
           type="button"

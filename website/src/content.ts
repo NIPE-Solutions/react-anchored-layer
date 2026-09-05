@@ -8,6 +8,7 @@ export const navigation = [
   ['collision', 'Collision'],
   ['sizing', 'Sizing'],
   ['scroll-resize', 'Scroll and resize'],
+  ['stress-test', 'Stress test'],
   ['nested-portals', 'Nested portals'],
   ['accessibility', 'Accessibility'],
   ['styling', 'Styling'],
