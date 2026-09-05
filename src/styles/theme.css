@@ -1,0 +1,7 @@
+[data-anchored-layer-content] {
+  border: 1px solid #d5d8e0;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  color: #17191f;
+  box-shadow: 0 0.75rem 2rem rgb(23 25 31 / 12%);
+}

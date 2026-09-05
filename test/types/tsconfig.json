@@ -1,0 +1,4 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": ["index.test-d.ts"]
+}

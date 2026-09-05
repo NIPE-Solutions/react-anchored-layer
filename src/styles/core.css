@@ -1,0 +1,8 @@
+[data-anchored-layer-content] {
+  box-sizing: border-box;
+}
+
+[data-anchored-layer-content][data-positioned='false'] {
+  visibility: hidden;
+  pointer-events: none;
+}

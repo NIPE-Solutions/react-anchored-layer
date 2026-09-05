@@ -1,0 +1,89 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  color: #17191f;
+  background: #f7f8fb;
+  font-family: system-ui, sans-serif;
+}
+
+button,
+input {
+  min-height: 40px;
+  font: inherit;
+}
+
+input {
+  width: 260px;
+}
+
+.fixture {
+  min-height: 100vh;
+  padding: 32px;
+}
+
+.centered {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 16px;
+}
+
+[data-testid='layer'] {
+  max-height: var(--anchored-layer-available-height);
+  overflow: auto;
+  border: 1px solid #6554c0;
+  background: white;
+  padding: 8px;
+}
+
+.clip-frame {
+  width: 420px;
+  height: 340px;
+  margin: 24px auto;
+  overflow: hidden;
+  border: 2px solid #17191f;
+}
+
+.scroller {
+  height: 100%;
+  overflow: auto;
+  padding: 20px 60px;
+}
+
+.spacer {
+  height: 220px;
+}
+
+.validation {
+  margin: 0 0 24px;
+}
+
+.collision-fixture {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-bottom: 20px;
+}
+
+.collision-fixture > button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+}
+
+.result {
+  min-height: 32px;
+  padding: 5px;
+}
