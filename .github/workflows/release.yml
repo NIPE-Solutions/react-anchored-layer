@@ -1,19 +1,25 @@
 name: Release package
 on:
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       tag:
         description: Exact release tag, such as v0.1.0-alpha.0
         required: true
         type: string
-      publish:
-        description: Publish after verification
-        required: true
-        default: false
-        type: boolean
+
+env:
+  RELEASE_TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.tag }}
+
+concurrency:
+  group: npm-publish-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
 permissions:
   contents: read
   id-token: write
+
 jobs:
   release:
     environment: npm
@@ -21,14 +27,17 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ env.RELEASE_TAG }}
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-          cache: npm
           registry-url: https://registry.npmjs.org
+          package-manager-cache: false
       - run: npm ci
       - run: npm run check
-      - run: node scripts/verify-release.mjs --tag=${{ inputs.tag }}
-      - if: ${{ inputs.publish }}
-        run: npm publish --provenance
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run test:e2e
+      - run: npm run test:website:e2e
+      - run: node scripts/verify-release.mjs --tag="${RELEASE_TAG}" --ensure-unpublished
+      - if: ${{ github.event_name == 'release' }}
+        run: npm publish --provenance --access public --tag alpha
