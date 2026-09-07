@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { AddressDemo } from './AddressDemo'
+import { StressDemo } from './StressDemo'
 import { apiRows, navigation, quickStart } from './content'
 
 function Section({
@@ -45,11 +46,11 @@ export function App() {
         <section className="hero" id="top">
           <div className="hero-copy">
             <p className="status-line">0.1 alpha · React 18.3 and 19</p>
-            <h1>Floating content that keeps its place.</h1>
+            <h1>Floating content that stays attached.</h1>
             <p className="lede">
               A small React primitive for rendering content through a portal
               while keeping it aligned with its anchor through scroll, resize,
-              and layout changes.
+              content changes, and layout shifts.
             </p>
             <div className="install">
               <code>npm install @nipe-solutions/react-anchored-layer</code>
@@ -127,8 +128,8 @@ export function App() {
             </Section>
             <Section
               id="portal-model"
-              title="Portal model"
-              intro="Content uses the nearest deliberate destination."
+              title="Escape clipping, not context"
+              intro="Choose a portal destination that matches the surrounding interaction layer."
             >
               <p>
                 An explicit <code>Portal container</code> wins, followed by the
@@ -136,6 +137,31 @@ export function App() {
                 <code>document.body</code>. Detached custom roots suppress
                 content instead of silently changing stacking context.
               </p>
+              <div className="portal-strategies">
+                <article>
+                  <h3>Body portal</h3>
+                  <p>Escapes clipping ancestors and is the simplest default.</p>
+                  <p className="tradeoff">
+                    It may sit outside a modal’s local layer or focus setup.
+                  </p>
+                </article>
+                <article>
+                  <h3>Custom modal portal root</h3>
+                  <p>
+                    Escapes inner clipping while staying in the modal layer.
+                  </p>
+                  <p className="tradeoff">
+                    Often the right choice for focus-trapped modal content.
+                  </p>
+                </article>
+                <article>
+                  <h3>Local rendering</h3>
+                  <p>Keeps a simple DOM relationship.</p>
+                  <p className="tradeoff">
+                    Overflow ancestors can clip the floating content.
+                  </p>
+                </article>
+              </div>
             </Section>
             <Section
               id="positioning"
@@ -172,7 +198,7 @@ export function App() {
             </Section>
             <Section
               id="scroll-resize"
-              title="Scroll and resize"
+              title="Stay attached while layout moves"
               intro="The layer follows ordinary layout change automatically."
             >
               <p>
@@ -180,6 +206,21 @@ export function App() {
                 element resize, and layout shifts. Closed layers do not keep an
                 update subscription.
               </p>
+            </Section>
+            <Section
+              id="stress-test"
+              title="Stress test"
+              intro="Change the environment; the layer keeps tracking the same anchor."
+            >
+              <p>
+                Grow asynchronous content, resize and scroll the clipped modal,
+                move the anchor, change direction, or request another placement.
+                The readout comes from the real positioned element.
+              </p>
+              <StressDemo />
+              <pre className="sizing-code">
+                <code>{`max-height: var(--anchored-layer-available-height);\noverflow: auto;`}</code>
+              </pre>
             </Section>
             <Section
               id="nested-portals"
@@ -264,8 +305,8 @@ export function App() {
             </Section>
             <Section
               id="examples"
-              title="Examples"
-              intro="The opening address search is the full stress case."
+              title="Position arbitrary content"
+              intro="Autocomplete is the main proof case, not a component boundary."
             >
               <p>
                 It combines modal clipping, a custom portal root, async-size
@@ -273,6 +314,12 @@ export function App() {
                 handling. The same API covers basic anchored content, RTL,
                 dynamic content, and custom roots.
               </p>
+              <div className="surface-list" aria-label="Example layer content">
+                <span>Color picker</span>
+                <span>Date panel</span>
+                <span>Mention suggestions</span>
+                <span>Floating inspector</span>
+              </div>
             </Section>
             <Section
               id="comparison"
@@ -327,7 +374,13 @@ export function App() {
           Part of{' '}
           <a href="https://opensource.nipesolutions.com">NIPE Open Source</a>.
         </p>
-        <nav aria-label="Legal">
+        <nav aria-label="Project links">
+          <a href="https://github.com/NIPE-Solutions/react-anchored-layer">
+            GitHub
+          </a>
+          <a href="https://github.com/NIPE-Solutions/react-anchored-layer/blob/main/CHANGELOG.md">
+            Changelog
+          </a>
           <a href="https://opensource.nipesolutions.com/impressum">Imprint</a>
           <a href="https://opensource.nipesolutions.com/privacy">Privacy</a>
           <a href="https://github.com/NIPE-Solutions/react-anchored-layer/blob/main/LICENSE">
