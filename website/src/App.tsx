@@ -45,7 +45,7 @@ export function App() {
       <main id="content">
         <section className="hero" id="top">
           <div className="hero-copy">
-            <p className="status-line">0.1 alpha · React 18.3 and 19</p>
+            <p className="status-line">1.0.0 stable · React 18.3 and 19</p>
             <h1>Floating content that stays attached.</h1>
             <p className="lede">
               A small React primitive for rendering content through a portal
@@ -53,12 +53,14 @@ export function App() {
               content changes, and layout shifts.
             </p>
             <div className="install">
-              <code>npm install @nipe-solutions/react-anchored-layer</code>
+              <code tabIndex={0} aria-label="Install React Anchored Layer">
+                npm install --save-exact @nipe-solutions/react-anchored-layer
+              </code>
               <button
                 type="button"
                 onClick={() => {
                   void navigator.clipboard.writeText(
-                    'npm install @nipe-solutions/react-anchored-layer',
+                    'npm install --save-exact @nipe-solutions/react-anchored-layer',
                   )
                 }}
               >
@@ -96,12 +98,18 @@ export function App() {
               intro="One positioning dependency; React stays a peer."
             >
               <pre>
-                <code>npm install @nipe-solutions/react-anchored-layer</code>
+                <code>
+                  npm install --save-exact @nipe-solutions/react-anchored-layer
+                </code>
               </pre>
               <p>
                 Positioning is powered by Floating UI. React Anchored Layer adds
                 a focused React composition model, portal behavior, and
                 project-level defaults around that positioning engine.
+              </p>
+              <p>
+                Version 1.0.0 is stable. Use React and React DOM 18.3 or 19 with
+                Node 24.
               </p>
             </Section>
             <Section
@@ -172,6 +180,10 @@ export function App() {
                 Choose top, right, bottom, or left with start, center, and end
                 alignment. Use <code>absolute</code> by default or{' '}
                 <code>fixed</code> for fixed-position application contexts.
+              </p>
+              <p>
+                Start and end follow the anchor’s text direction, including when
+                content portals to the body.
               </p>
             </Section>
             <Section
@@ -302,6 +314,19 @@ export function App() {
                   </tbody>
                 </table>
               </div>
+              <p>
+                Render one Anchor and one Content per Root. An{' '}
+                <code>asChild</code> child must forward its ref to an
+                HTMLElement; fragments are not anchors. React 19 ref cleanup is
+                preserved.
+              </p>
+              <p>
+                See the{' '}
+                <a href="https://github.com/NIPE-Solutions/react-anchored-layer/blob/main/docs/API.md">
+                  complete API reference
+                </a>{' '}
+                for every prop and default.
+              </p>
             </Section>
             <Section
               id="examples"

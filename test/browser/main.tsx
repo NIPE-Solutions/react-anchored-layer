@@ -14,13 +14,35 @@ function Layer({ children = 'Result' }: { children?: React.ReactNode }) {
 }
 
 function BasicFixture({ rtl = false }: { rtl?: boolean }) {
+  const [rightToLeft, setRightToLeft] = useState(rtl)
   return (
-    <main className="fixture centered" dir={rtl ? 'rtl' : 'ltr'}>
+    <main className="fixture centered" dir={rightToLeft ? 'rtl' : 'ltr'}>
+      {rtl ? (
+        <button
+          type="button"
+          onClick={() => {
+            setRightToLeft((value) => !value)
+          }}
+        >
+          Toggle direction
+        </button>
+      ) : null}
       <A.Root open>
         <A.Anchor asChild>
           <input data-testid="anchor" aria-label="Address" />
         </A.Anchor>
-        <Layer />
+        {rtl ? (
+          <A.Content
+            data-testid="layer"
+            offset={6}
+            style={{ width: 100 }}
+            role="region"
+          >
+            Result
+          </A.Content>
+        ) : (
+          <Layer />
+        )}
       </A.Root>
     </main>
   )
@@ -51,6 +73,43 @@ function ScrollFixture() {
           <div className="spacer" />
         </div>
       </div>
+    </main>
+  )
+}
+
+function DirectionFixture() {
+  const [mode, setMode] = useState<'auto' | 'class' | 'ltr'>('auto')
+  return (
+    <main className="fixture centered" dir="ltr">
+      <button
+        type="button"
+        onClick={() => {
+          setMode('class')
+        }}
+      >
+        Use CSS direction
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          setMode('ltr')
+        }}
+      >
+        Use LTR direction
+      </button>
+      <A.Root open>
+        <A.Anchor asChild>
+          <input data-testid="anchor" aria-label="Address" />
+        </A.Anchor>
+        <A.Content
+          data-testid="layer"
+          dir={mode === 'auto' ? 'auto' : undefined}
+          className={mode === 'class' ? 'rtl-content' : undefined}
+          style={{ width: 100 }}
+        >
+          שלום
+        </A.Content>
+      </A.Root>
     </main>
   )
 }
@@ -124,6 +183,8 @@ const content =
     <CollisionFixture />
   ) : fixture === 'rtl' ? (
     <BasicFixture rtl />
+  ) : fixture === 'direction' ? (
+    <DirectionFixture />
   ) : fixture === 'lifecycle' ? (
     <LifecycleFixture />
   ) : (

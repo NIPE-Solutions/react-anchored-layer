@@ -8,7 +8,6 @@ import {
 } from '@floating-ui/react-dom'
 import {
   forwardRef,
-  useLayoutEffect,
   useMemo,
   useState,
   type CSSProperties,
@@ -20,9 +19,17 @@ import type { AnchoredLayerContentProps } from './contracts'
 import { useAnchoredLayerContext, usePortalBoundary } from './context'
 import { getPlacementData } from './geometry'
 import { Portal } from './portal'
+import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 
 type CustomProperties = CSSProperties &
   Record<`--anchored-layer-${string}`, string>
+
+function getDirection(element: HTMLElement): 'ltr' | 'rtl' {
+  return element.ownerDocument.defaultView?.getComputedStyle(element)
+    .direction === 'rtl'
+    ? 'rtl'
+    : 'ltr'
+}
 
 export const Content = forwardRef<HTMLDivElement, AnchoredLayerContentProps>(
   function Content(
@@ -31,6 +38,7 @@ export const Content = forwardRef<HTMLDivElement, AnchoredLayerContentProps>(
       children,
       collisionBoundary,
       collisionPadding = 8,
+      dir,
       matchAnchorWidth = false,
       offset = 4,
       placement = 'bottom-start',
@@ -44,6 +52,14 @@ export const Content = forwardRef<HTMLDivElement, AnchoredLayerContentProps>(
       'AnchoredLayer.Content',
     )
     const insidePortal = usePortalBoundary()
+    const positionKey = useMemo(() => Symbol(), [anchor, content])
+    const [anchorDirection, setAnchorDirection] = useState<'ltr' | 'rtl'>('ltr')
+    const [direction, setDirection] = useState<'ltr' | 'rtl'>('ltr')
+    // Portals retain React context but lose inherited DOM direction.
+    useIsomorphicLayoutEffect(() => {
+      if (anchor !== null) setAnchorDirection(getDirection(anchor))
+      if (content !== null) setDirection(getDirection(content))
+    })
     const middleware = useMemo(() => {
       const boundaryOptions = {
         ...(collisionBoundary === undefined
@@ -77,54 +93,53 @@ export const Content = forwardRef<HTMLDivElement, AnchoredLayerContentProps>(
             )
           },
         }),
+        // A completed result must belong to the current elements, not a previous anchor.
+        {
+          name: 'anchoredLayer',
+          options: positionKey,
+          fn: () => ({ data: { key: positionKey } }),
+        },
       ]
     }, [
       avoidCollisions,
       collisionBoundary,
       collisionPadding,
-      matchAnchorWidth,
       offset,
+      positionKey,
     ])
     const {
       floatingStyles,
       isPositioned,
+      middlewareData,
       placement: finalPlacement,
       refs,
+      update,
     } = useFloating({
       elements: { reference: anchor },
       middleware,
       open,
       placement,
       strategy,
-      whileElementsMounted(reference, floating, update) {
-        return autoUpdate(reference, floating, update, {
-          ancestorResize: true,
-          ancestorScroll: true,
-          elementResize: true,
-          layoutShift: true,
-        })
-      },
+      whileElementsMounted: autoUpdate,
     })
-    const [positionedPair, setPositionedPair] = useState<{
-      anchor: HTMLElement
-      content: HTMLElement
-    } | null>(null)
-
-    useLayoutEffect(() => {
-      if (isPositioned && anchor !== null && content !== null) {
-        setPositionedPair({ anchor, content })
-      } else {
-        setPositionedPair(null)
-      }
-    }, [anchor, content, isPositioned])
+    const resolvedKey = (
+      middlewareData.anchoredLayer as { key?: symbol } | undefined
+    )?.key
+    useIsomorphicLayoutEffect(() => {
+      if (open && anchor !== null) update()
+    }, [anchor, direction, open, positionKey, resolvedKey, update])
+    const composedRef = useMemo(
+      () => composeRefs(forwardedRef, refs.setFloating, setContent),
+      [forwardedRef, refs.setFloating, setContent],
+    )
 
     if (!open || anchor === null) return null
 
-    const positioned =
-      isPositioned &&
-      positionedPair?.anchor === anchor &&
-      positionedPair.content === content
-    const { align, side, transformOrigin } = getPlacementData(finalPlacement)
+    const positioned = isPositioned && resolvedKey === positionKey
+    const { align, side, transformOrigin } = getPlacementData(
+      finalPlacement,
+      direction === 'rtl',
+    )
     const mergedStyle: CustomProperties = {
       ...style,
       ...floatingStyles,
@@ -137,12 +152,13 @@ export const Content = forwardRef<HTMLDivElement, AnchoredLayerContentProps>(
     const layer = (
       <div
         {...contentProps}
+        dir={dir ?? anchorDirection}
         data-anchored-layer-content=""
         data-align={align}
         data-positioned={positioned ? 'true' : 'false'}
         data-side={side}
         data-state="open"
-        ref={composeRefs(forwardedRef, refs.setFloating, setContent)}
+        ref={composedRef}
         style={mergedStyle}
       >
         {children}

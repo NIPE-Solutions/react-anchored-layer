@@ -9,3 +9,4 @@ test-results/
 website/dist/
 .vercel
 .env*
+**/.DS_Store

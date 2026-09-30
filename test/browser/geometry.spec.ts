@@ -81,4 +81,72 @@ test('start alignment respects RTL', async ({ page }) => {
     }
   })
   expect(Math.abs(edges.anchor - edges.layer)).toBeLessThanOrEqual(1)
+  await expect(page.getByTestId('layer')).toHaveCSS('direction', 'rtl')
+  expect(
+    await page
+      .getByTestId('layer')
+      .evaluate((node) =>
+        node.style.getPropertyValue('--anchored-layer-transform-origin'),
+      ),
+  ).toBe('right top')
+  await page.getByRole('button', { name: 'Toggle direction' }).click()
+  await expect(page.getByTestId('layer')).toHaveCSS('direction', 'ltr')
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const anchor = document.querySelector('[data-testid="anchor"]')
+        const layer = document.querySelector('[data-testid="layer"]')
+        if (!(anchor instanceof HTMLElement) || !(layer instanceof HTMLElement))
+          throw new Error('Missing layer')
+        return Math.abs(
+          anchor.getBoundingClientRect().left -
+            layer.getBoundingClientRect().left,
+        )
+      }),
+    )
+    .toBeLessThanOrEqual(1)
+  expect(
+    await page
+      .getByTestId('layer')
+      .evaluate((node) =>
+        node.style.getPropertyValue('--anchored-layer-transform-origin'),
+      ),
+  ).toBe('left top')
+})
+
+test('origin follows automatic and CSS direction on the content', async ({
+  page,
+}) => {
+  await page.goto('/?fixture=direction')
+  const layer = page.getByTestId('layer')
+  const origin = () =>
+    layer.evaluate((node) =>
+      node.style.getPropertyValue('--anchored-layer-transform-origin'),
+    )
+  for (const mode of ['auto', 'class']) {
+    if (mode === 'class')
+      await page.getByRole('button', { name: 'Use CSS direction' }).click()
+    await expect(layer).toHaveCSS('direction', 'rtl')
+    await expect.poll(origin).toBe('right top')
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const anchor = document.querySelector('[data-testid="anchor"]')
+          const content = document.querySelector('[data-testid="layer"]')
+          if (
+            !(anchor instanceof HTMLElement) ||
+            !(content instanceof HTMLElement)
+          )
+            throw new Error('Missing layer')
+          return Math.abs(
+            anchor.getBoundingClientRect().right -
+              content.getBoundingClientRect().right,
+          )
+        }),
+      )
+      .toBeLessThanOrEqual(1)
+  }
+  await page.getByRole('button', { name: 'Use LTR direction' }).click()
+  await expect(layer).toHaveCSS('direction', 'ltr')
+  await expect.poll(origin).toBe('left top')
 })

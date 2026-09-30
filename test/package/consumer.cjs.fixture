@@ -1,0 +1,6 @@
+const React = require('react')
+const { renderToString } = require('react-dom/server')
+const api = require('@nipe-solutions/react-anchored-layer')
+const assertConsumer = require('./assert-consumer.cjs')
+
+assertConsumer(React, renderToString, api, require.resolve)

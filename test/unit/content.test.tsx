@@ -28,11 +28,17 @@ vi.mock('@floating-ui/react-dom', () => ({
       context: {},
       floatingStyles: { left: 12, position: 'absolute', top: 34 },
       isPositioned: floatingState.isPositioned,
+      middlewareData: {
+        anchoredLayer: {
+          key: (options.middleware.at(-1) as { options: symbol }).options,
+        },
+      },
       placement: floatingState.placement,
       refs: {
         setFloating: vi.fn(),
         setReference: vi.fn(),
       },
+      update: vi.fn(),
     }
   }),
 }))
@@ -112,7 +118,7 @@ describe('Content', () => {
 
     expect(
       floatingState.middleware.map((entry) => (entry as { name: string }).name),
-    ).toEqual(['offset', 'flip', 'shift', 'size'])
+    ).toEqual(['offset', 'flip', 'shift', 'size', 'anchoredLayer'])
     expect((floatingState.middleware[0] as { options: unknown }).options).toBe(
       6,
     )

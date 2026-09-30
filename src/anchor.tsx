@@ -2,7 +2,9 @@ import {
   Children,
   cloneElement,
   forwardRef,
+  Fragment,
   isValidElement,
+  useMemo,
   type ReactElement,
   type Ref,
 } from 'react'
@@ -18,30 +20,40 @@ export const Anchor = forwardRef<HTMLElement, AnchoredLayerAnchorProps>(
   function Anchor({ asChild = false, children, ...anchorProps }, forwardedRef) {
     const { setAnchor } = useAnchoredLayerContext('AnchoredLayer.Anchor')
 
-    if (!asChild) {
+    let child: RefElement | undefined
+    if (asChild) {
+      try {
+        const onlyChild = Children.only(children)
+        if (
+          !isValidElement<{ ref?: Ref<HTMLElement> }>(onlyChild) ||
+          onlyChild.type === Fragment
+        )
+          throw new Error()
+        child = onlyChild
+      } catch {
+        throw new Error(
+          'AnchoredLayer.Anchor with asChild requires one React element',
+        )
+      }
+    }
+    const childRef = child === undefined ? undefined : getElementRef(child)
+    const composedRef = useMemo(
+      () => composeRefs(childRef, forwardedRef, setAnchor),
+      [childRef, forwardedRef, setAnchor],
+    )
+
+    if (child === undefined) {
       return (
-        <span {...anchorProps} ref={composeRefs(forwardedRef, setAnchor)}>
+        <span {...anchorProps} ref={composedRef}>
           {children}
         </span>
-      )
-    }
-
-    let child: RefElement
-    try {
-      const onlyChild = Children.only(children)
-      if (!isValidElement<{ ref?: Ref<HTMLElement> }>(onlyChild))
-        throw new Error()
-      child = onlyChild
-    } catch {
-      throw new Error(
-        'AnchoredLayer.Anchor with asChild requires one React element',
       )
     }
 
     return cloneElement(child, {
       ...anchorProps,
       ...child.props,
-      ref: composeRefs(getElementRef(child), forwardedRef, setAnchor),
+      ref: composedRef,
     })
   },
 )

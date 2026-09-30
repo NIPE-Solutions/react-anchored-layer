@@ -1,0 +1,11 @@
+import React from 'react'
+import { renderToString } from 'react-dom/server'
+import * as api from '@nipe-solutions/react-anchored-layer'
+import assertConsumer from './assert-consumer.cjs'
+
+assertConsumer(
+  React,
+  renderToString,
+  api,
+  (specifier) => new URL(import.meta.resolve(specifier)),
+)
