@@ -4,6 +4,16 @@ import { getPlacementData } from '../../src/geometry'
 
 describe('getPlacementData', () => {
   it.each([
+    ['top-start', 'right bottom'],
+    ['top-end', 'left bottom'],
+    ['bottom-start', 'right top'],
+    ['bottom-end', 'left top'],
+    ['right-start', 'left top'],
+    ['left-end', 'right bottom'],
+  ] as const)('maps %s to the physical RTL origin', (placement, origin) => {
+    expect(getPlacementData(placement, true).transformOrigin).toBe(origin)
+  })
+  it.each([
     ['top-start', 'top', 'start', 'left bottom'],
     ['top', 'top', 'center', 'center bottom'],
     ['top-end', 'top', 'end', 'right bottom'],

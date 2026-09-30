@@ -1,0 +1,53 @@
+const assert = require('node:assert/strict')
+const { readFileSync } = require('node:fs')
+
+module.exports = function assertConsumer(React, renderToString, api, resolve) {
+  assert.equal(typeof window, 'undefined')
+  assert.equal(typeof document, 'undefined')
+  assert.deepEqual(Object.keys(api).sort(), [
+    'Anchor',
+    'AnchoredLayer',
+    'Content',
+    'Portal',
+    'Provider',
+    'Root',
+  ])
+  assert.ok(Object.isFrozen(api.AnchoredLayer))
+  for (const name of ['Anchor', 'Content', 'Portal', 'Provider', 'Root']) {
+    assert.equal(api.AnchoredLayer[name], api[name])
+  }
+
+  for (const components of [api, api.AnchoredLayer]) {
+    const markup = renderToString(
+      React.createElement(
+        components.Provider,
+        null,
+        React.createElement(
+          components.Root,
+          { open: true },
+          React.createElement(
+            components.Anchor,
+            { asChild: true },
+            React.createElement('button', { type: 'button' }, 'Server anchor'),
+          ),
+          React.createElement(components.Content, null, 'Floating content'),
+        ),
+      ),
+    )
+    assert.equal(markup, '<button type="button">Server anchor</button>')
+    assert.equal(
+      renderToString(
+        React.createElement(components.Portal, null, 'Portal content'),
+      ),
+      '',
+    )
+  }
+
+  for (const stylesheet of ['core.css', 'theme.css', 'styles.css']) {
+    const stylesheetPath = resolve(
+      `@nipe-solutions/react-anchored-layer/${stylesheet}`,
+    )
+    assert.ok(readFileSync(stylesheetPath, 'utf8').trim().length > 0)
+  }
+  console.log('consumer contracts verified')
+}

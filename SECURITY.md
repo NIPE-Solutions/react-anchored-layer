@@ -2,8 +2,8 @@
 
 ## Supported versions
 
-This project is in prerelease development. Security fixes target the latest
-published prerelease.
+Security fixes target the latest stable release in the `1.x` series. Upgrade
+to the current `latest` version before reporting a suspected vulnerability.
 
 ## Reporting a vulnerability
 

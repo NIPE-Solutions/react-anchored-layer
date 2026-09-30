@@ -8,6 +8,7 @@ export interface PlacementData {
 
 export function getPlacementData(
   placement: AnchoredLayerPlacement,
+  rtl = false,
 ): PlacementData {
   const [side, explicitAlign] = placement.split('-') as [
     PlacementData['side'],
@@ -24,7 +25,7 @@ export function getPlacementData(
     align === 'center'
       ? 'center'
       : side === 'top' || side === 'bottom'
-        ? align === 'start'
+        ? (align === 'start') !== rtl
           ? 'left'
           : 'right'
         : align === 'start'

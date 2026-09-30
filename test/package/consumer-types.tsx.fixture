@@ -1,0 +1,86 @@
+import { createRef, type RefCallback } from 'react'
+import {
+  Anchor,
+  AnchoredLayer,
+  Content,
+  Portal,
+  Provider,
+  Root,
+  type AnchoredLayerAnchorProps,
+  type AnchoredLayerContentProps,
+  type AnchoredLayerOffset,
+  type AnchoredLayerOffsetOptions,
+  type AnchoredLayerPlacement,
+  type AnchoredLayerPortalProps,
+  type AnchoredLayerProviderProps,
+  type AnchoredLayerRootProps,
+  type AnchoredLayerStrategy,
+} from '@nipe-solutions/react-anchored-layer'
+
+const anchorRef = createRef<HTMLElement>()
+const contentRef = createRef<HTMLDivElement>()
+const anchorCallback: RefCallback<HTMLElement> = (element) => {
+  element?.focus()
+}
+const contentCallback: RefCallback<HTMLDivElement> = (element) => {
+  element?.style.setProperty('color', 'red')
+}
+const cleanupRef: RefCallback<HTMLElement> = (element) => {
+  element?.setAttribute('data-attached', '')
+  return () => element?.removeAttribute('data-attached')
+}
+const placement: AnchoredLayerPlacement = 'bottom-start'
+const strategy: AnchoredLayerStrategy = 'fixed'
+const offsetOptions: AnchoredLayerOffsetOptions = { crossAxis: 2, mainAxis: 6 }
+const offset: AnchoredLayerOffset = offsetOptions
+const anchorProps: AnchoredLayerAnchorProps = { asChild: true, title: 'Anchor' }
+const contentProps: AnchoredLayerContentProps = {
+  placement,
+  strategy,
+  offset,
+  collisionPadding: 8,
+  matchAnchorWidth: true,
+  role: 'dialog',
+  onClick: (event) => event.currentTarget.focus(),
+}
+const rootProps: AnchoredLayerRootProps = {
+  open: true,
+  onOpenChange: (open: boolean) => void open,
+}
+const providerProps: AnchoredLayerProviderProps = { portalRoot: null }
+const portalProps: AnchoredLayerPortalProps = { container: null }
+
+export const namedUsage = (
+  <Provider {...providerProps}>
+    <Root {...rootProps}>
+      <Anchor {...anchorProps} ref={anchorRef}>
+        <button>Anchor</button>
+      </Anchor>
+      <Portal {...portalProps}>
+        <Content {...contentProps} ref={contentRef}>
+          Content
+        </Content>
+      </Portal>
+    </Root>
+  </Provider>
+)
+
+export const namespaceUsage = (
+  <AnchoredLayer.Provider>
+    <AnchoredLayer.Root defaultOpen>
+      <AnchoredLayer.Anchor ref={anchorCallback}>Anchor</AnchoredLayer.Anchor>
+      <AnchoredLayer.Content ref={contentCallback}>
+        Content
+      </AnchoredLayer.Content>
+      <AnchoredLayer.Anchor ref={cleanupRef}>Cleanup ref</AnchoredLayer.Anchor>
+    </AnchoredLayer.Root>
+  </AnchoredLayer.Provider>
+)
+
+// @ts-expect-error An anchor must use an HTML element ref.
+export const invalidAnchorRef = <Anchor ref={createRef<SVGSVGElement>()} />
+const buttonRef = createRef<HTMLButtonElement>()
+// @ts-expect-error Content forwards a div ref, not a button ref.
+export const invalidContentRef = <Content ref={buttonRef} />
+// @ts-expect-error A placement outside the public union is invalid.
+export const invalidPlacement: AnchoredLayerPlacement = 'center'

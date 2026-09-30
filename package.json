@@ -1,6 +1,6 @@
 {
   "name": "@nipe-solutions/react-anchored-layer",
-  "version": "0.1.0-alpha.0",
+  "version": "1.0.0",
   "description": "Anchored floating layers for React.",
   "homepage": "https://react-anchored-layer.nipesolutions.com",
   "repository": {
@@ -39,7 +39,7 @@
   "publishConfig": {
     "access": "public",
     "provenance": true,
-    "tag": "alpha"
+    "tag": "latest"
   },
   "scripts": {
     "test": "vitest run",
@@ -57,7 +57,7 @@
     "test:website": "node scripts/verify-website.mjs",
     "test:website:e2e": "playwright test --config playwright.website.config.ts",
     "test:e2e": "playwright test",
-    "test:workflows": "node --test scripts/verify-workflows.test.mjs scripts/verify-release.test.mjs && node scripts/verify-workflows.mjs",
+    "test:workflows": "node --test scripts/verify-workflows.test.mjs scripts/verify-release.test.mjs scripts/pack-artifact.test.mjs && node scripts/verify-workflows.mjs",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run test:unit && npm run test:types && npm run build:dist && npm run test:api && npm run test:size && npm run test:package && npm run build:website && npm run test:website && npm run test:workflows",
     "release:check": "npm run check && node scripts/verify-release.mjs --dry-run"
   },

@@ -2,7 +2,7 @@
 
 Anchored floating layers for React.
 
-This repository is under active development toward `0.1.0-alpha.0`.
+Version `1.0.0` is the stable release.
 
 React Anchored Layer renders arbitrary content through a portal and keeps it
 aligned with an anchor through scrolling, resizing, and layout changes. It does
@@ -15,11 +15,11 @@ positioning engine.
 ## Installation
 
 ```sh
-npm install @nipe-solutions/react-anchored-layer
+npm install --save-exact @nipe-solutions/react-anchored-layer
 ```
 
 React and React DOM are peer dependencies. React 18.3 and React 19 are
-supported.
+supported. The package currently requires Node 24 for installation and development.
 
 ## Quick start
 
@@ -68,15 +68,19 @@ the following CSS variables:
 Module import and server rendering are safe without DOM globals. Portal content
 is established on the client after mounting.
 
+See the [API reference](docs/API.md) for prop defaults, ref behavior, and portal
+lifecycle details. Applications should render one anchor and one content per
+root. Child components used with `asChild` must forward a ref to an HTMLElement.
+
 ## Compatibility and size
 
 The package targets current Chromium, Firefox, and WebKit, with automated
 Playwright coverage in all three engines. The published JavaScript is measured
 with React, React DOM, and Floating UI external: the current build is about
-2.2 kB gzip for ESM and 1.8 kB gzip for CommonJS. The packed prerelease artifact
-is about 7.4 kB.
+2.5 kB gzip for ESM and 2.1 kB gzip for CommonJS. The packed artifact is kept
+below 15 kB.
 
-Known initial limitations are deliberate: there are no virtual anchors, arrow,
+The scope is deliberate: there are no virtual anchors, arrow,
 raw middleware API, automatic offscreen dismissal, vertical-writing-mode claim,
 or global stacking coordinator.
 
@@ -85,8 +89,10 @@ or global stacking coordinator.
 Use Node 24 and npm 11.
 
 ```sh
-npm install
+npm ci
 npm run check
+npm run test:e2e
+npm run test:website:e2e
 ```
 
 ## License

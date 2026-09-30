@@ -87,3 +87,6 @@ input {
   min-height: 32px;
   padding: 5px;
 }
+.rtl-content {
+  direction: rtl;
+}

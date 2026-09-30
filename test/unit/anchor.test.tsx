@@ -1,4 +1,4 @@
-import { createRef, forwardRef, useState } from 'react'
+import { createRef, forwardRef, Fragment, useState } from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
@@ -92,6 +92,67 @@ describe('Anchor', () => {
       render(
         <Root>
           <Anchor asChild>text</Anchor>
+        </Root>,
+      ),
+    ).toThrow('AnchoredLayer.Anchor with asChild requires one React element')
+  })
+
+  it('keeps a child ref attached across ordinary parent renders', () => {
+    const attachments: (HTMLElement | null)[] = []
+    const childRef = (node: HTMLElement | null) => {
+      attachments.push(node)
+    }
+    const fixture = (label: string) => (
+      <Root>
+        <Anchor asChild>
+          <button ref={childRef}>{label}</button>
+        </Anchor>
+      </Root>
+    )
+    const { rerender, unmount } = render(fixture('Before'))
+    const node = screen.getByRole('button')
+    attachments.length = 0
+    rerender(fixture('After'))
+    expect(screen.getByRole('button')).toBe(node)
+    expect(attachments).toEqual([])
+    unmount()
+    expect(attachments).toEqual([null])
+  })
+
+  it('runs React 19 child ref cleanup when the anchor unmounts', () => {
+    const attached: HTMLElement[] = []
+    const released: HTMLElement[] = []
+    const childRef = (node: HTMLElement | null) => {
+      if (node !== null) {
+        attached.push(node)
+        return () => {
+          released.push(node)
+        }
+      }
+    }
+    const { unmount } = render(
+      <Root>
+        <Anchor asChild>
+          <button ref={childRef}>Reference</button>
+        </Anchor>
+      </Root>,
+    )
+    const node = screen.getByRole('button')
+    expect(attached).toEqual([node])
+    expect(released).toEqual([])
+    unmount()
+    expect(released).toEqual([node])
+  })
+
+  it('rejects a fragment that cannot provide an anchor element', () => {
+    expect(() =>
+      render(
+        <Root>
+          <Anchor asChild>
+            <Fragment>
+              <button>Reference</button>
+            </Fragment>
+          </Anchor>
         </Root>,
       ),
     ).toThrow('AnchoredLayer.Anchor with asChild requires one React element')

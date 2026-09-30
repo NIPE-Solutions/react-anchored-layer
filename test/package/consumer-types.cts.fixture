@@ -1,0 +1,21 @@
+import React = require('react')
+import Layer = require('@nipe-solutions/react-anchored-layer')
+
+const anchorRef = React.createRef<HTMLElement>()
+const contentRef = React.createRef<HTMLDivElement>()
+const contentProps: Layer.AnchoredLayerContentProps = {
+  placement: 'top-end',
+  strategy: 'absolute',
+  offset: 8,
+}
+
+export const usage = React.createElement(
+  Layer.AnchoredLayer.Root,
+  { open: true },
+  React.createElement(Layer.Anchor, { ref: anchorRef }, 'Anchor'),
+  React.createElement(
+    Layer.AnchoredLayer.Content,
+    { ...contentProps, ref: contentRef },
+    'Content',
+  ),
+)
