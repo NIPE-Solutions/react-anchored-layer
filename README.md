@@ -1,16 +1,31 @@
 # React Anchored Layer
 
-Anchored floating layers for React.
+Keep floating React content aligned with its anchor, even when the page scrolls
+or the layout changes.
 
-Version `1.0.0` is the stable release.
+Use it for a positioned surface whose interaction you already own: contextual
+help beside a button, results below an input, or a panel attached to a control.
+The library handles measurement, collision avoidance, and portals. Your
+application decides what the surface means and how people interact with it.
 
-React Anchored Layer renders arbitrary content through a portal and keeps it
-aligned with an anchor through scrolling, resizing, and layout changes. It does
-not provide dropdown, combobox, menu, tooltip, dismissal, or focus semantics.
+[Documentation and demos](https://react-anchored-layer.nipesolutions.com) ·
+[API reference](docs/API.md) ·
+[npm](https://www.npmjs.com/package/@nipe-solutions/react-anchored-layer)
 
-Positioning is powered by Floating UI. React Anchored Layer adds a focused React
-composition model, portal behavior, and project-level defaults around that
-positioning engine.
+## Why use it
+
+- Keep an anchor and floating surface in sync through scrolling, resizing,
+  and layout changes without maintaining positioning listeners yourself.
+- Match an input's width, choose a placement and offset, and let collision
+  handling flip or shift the surface when space is limited.
+- Render through a body portal or a container you choose, including one inside
+  an existing modal's focus boundary.
+- Supply ordinary React content and your own CSS. No menu, tooltip, or combobox
+  behavior is imposed on it.
+
+Positioning uses Floating UI. This package adds a small React composition API
+and portal lifecycle around that engine; it does not replace Floating UI's
+full middleware API.
 
 ## Installation
 
@@ -18,36 +33,70 @@ positioning engine.
 npm install --save-exact @nipe-solutions/react-anchored-layer
 ```
 
-React and React DOM are peer dependencies. React 18.3 and React 19 are
-supported. The package currently requires Node 24 for installation and development.
+Stable version: **1.0.0**. React 18.3 or 19 and the matching React DOM version
+are peer dependencies. The package requires Node.js 24 for installation and
+repository development.
 
-## Quick start
+## Show a note beside a button
 
 ```tsx
+import { useId, useState } from 'react'
 import { AnchoredLayer } from '@nipe-solutions/react-anchored-layer'
-import '@nipe-solutions/react-anchored-layer/core.css'
+import '@nipe-solutions/react-anchored-layer/styles.css'
 
-;<AnchoredLayer.Root open={open} onOpenChange={setOpen}>
-  <AnchoredLayer.Anchor asChild>
-    <input aria-controls="address-results" aria-expanded={open} />
-  </AnchoredLayer.Anchor>
-  <AnchoredLayer.Content
-    id="address-results"
-    placement="bottom-start"
-    offset={6}
-    matchAnchorWidth
-  >
-    {results}
-  </AnchoredLayer.Content>
-</AnchoredLayer.Root>
+export function BillingHelp() {
+  const [open, setOpen] = useState(false)
+  const noteId = useId()
+
+  return (
+    <AnchoredLayer.Root open={open} onOpenChange={setOpen}>
+      <AnchoredLayer.Anchor asChild>
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls={open ? noteId : undefined}
+          onClick={() => setOpen((value) => !value)}
+          onBlur={() => setOpen(false)}
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') setOpen(false)
+          }}
+        >
+          How does billing work?
+        </button>
+      </AnchoredLayer.Anchor>
+      <AnchoredLayer.Content
+        id={noteId}
+        role="note"
+        placement="bottom-start"
+        offset={8}
+      >
+        Your next invoice includes usage from the previous billing period.
+      </AnchoredLayer.Content>
+    </AnchoredLayer.Root>
+  )
+}
 ```
+
+This example supplies its own toggle, Escape handling, and blur dismissal.
+Anchored Layer does not add them automatically. Interactive popups need their
+own focus and keyboard behavior; this non-interactive note is not a menu or
+combobox recipe.
 
 `Content` portals to `document.body` by default. Wrap it in
 `AnchoredLayer.Portal` to select a custom container, or provide a scoped default
 with `AnchoredLayer.Provider`.
 
-The core stylesheet contains positioning mechanics only. `theme.css` is an
-optional visual starting point, and `styles.css` combines both.
+`styles.css` combines positioning mechanics and an optional default theme.
+For your own visual design, import `core.css` instead. `theme.css` is also
+available separately.
+
+## Choose the right abstraction
+
+Use Anchored Layer when positioning and portals are the missing pieces, while
+your application already owns open state and interaction semantics. Use a
+complete accessible menu, tooltip, or combobox implementation when you need
+those behaviors provided for you. Use Floating UI directly when you need
+virtual anchors, arrows, or custom middleware.
 
 ## Responsibility
 
@@ -72,6 +121,9 @@ See the [API reference](docs/API.md) for prop defaults, ref behavior, and portal
 lifecycle details. Applications should render one anchor and one content per
 root. Child components used with `asChild` must forward a ref to an HTMLElement.
 
+For a results panel, combine `matchAnchorWidth` with your own `max-height` and
+`overflow` rules; measurement does not make content scrollable automatically.
+
 ## Compatibility and size
 
 The package targets current Chromium, Firefox, and WebKit, with automated
@@ -95,6 +147,12 @@ npm run test:e2e
 npm run test:website:e2e
 ```
 
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a PR. Report reproducible
+problems through [GitHub Issues](https://github.com/NIPE-Solutions/react-anchored-layer/issues)
+and vulnerabilities through the route in [SECURITY.md](SECURITY.md).
+
+Part of [NIPE Open Source](https://opensource.nipesolutions.com).
+
 ## License
 
-MIT
+[MIT](LICENSE)
