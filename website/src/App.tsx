@@ -80,7 +80,10 @@ export function App() {
             to support the work and help others find it.
           </p>
           <div className="project-support-actions">
-            <a href="https://github.com/NIPE-Solutions/react-anchored-layer">
+            <a
+              className="project-support-primary"
+              href="https://github.com/NIPE-Solutions/react-anchored-layer"
+            >
               Star on GitHub
             </a>
             <a href="https://opensource.nipesolutions.com">

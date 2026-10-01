@@ -158,6 +158,13 @@ a {
 .project-support-actions a:hover {
   background: var(--surface);
 }
+.project-support-actions .project-support-primary {
+  background: var(--signal-deep);
+  color: var(--surface);
+}
+.project-support-actions .project-support-primary:hover {
+  background: var(--signal);
+}
 .status-line {
   margin: 0 0 18px;
   color: var(--signal-deep);
