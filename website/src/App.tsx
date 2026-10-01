@@ -70,6 +70,27 @@ export function App() {
           </div>
           <AddressDemo />
         </section>
+        <section
+          className="project-support"
+          aria-labelledby="project-support-title"
+        >
+          <h2 id="project-support-title">Useful in your project?</h2>
+          <p>
+            If Anchored Layer helps your project, a GitHub star is a simple way
+            to support the work and help others find it.
+          </p>
+          <div className="project-support-actions">
+            <a
+              className="project-support-primary"
+              href="https://github.com/NIPE-Solutions/react-anchored-layer"
+            >
+              Star on GitHub
+            </a>
+            <a href="https://opensource.nipesolutions.com">
+              Explore NIPE Open Source
+            </a>
+          </div>
+        </section>
         <div className="docs-layout">
           <aside className="docs-rail">
             <nav aria-label="Documentation">
