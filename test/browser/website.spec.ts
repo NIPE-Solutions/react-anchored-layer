@@ -1,6 +1,50 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
+test('homepage support links follow the demo and remain usable at mobile sizes', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/')
+  const support = page.getByRole('region', { name: 'Useful in your project?' })
+  await expect(support).toBeVisible()
+  await expect(
+    support.getByRole('heading', { level: 2, name: 'Useful in your project?' }),
+  ).toBeVisible()
+  expect(
+    await support.evaluate((element) =>
+      element.previousElementSibling?.matches('.hero'),
+    ),
+  ).toBe(true)
+  const links = [
+    [
+      'Star on GitHub',
+      'https://github.com/NIPE-Solutions/react-anchored-layer',
+    ],
+    ['Explore NIPE Open Source', 'https://opensource.nipesolutions.com'],
+  ] as const
+  for (const width of [1440, 320]) {
+    await page.setViewportSize({ width, height: 900 })
+    await support.screenshot({
+      path: testInfo.outputPath(`support-${width.toString()}.png`),
+    })
+    for (const [name, href] of links) {
+      const link = support.getByRole('link', { name, exact: true })
+      await expect(link).toHaveAttribute('href', href)
+      await link.focus()
+      await expect(link).toBeFocused()
+      await expect(link).toHaveCSS('outline-style', 'solid')
+      const bounds = await link.boundingBox()
+      expect(bounds?.height).toBeGreaterThanOrEqual(44)
+      expect(bounds?.width).toBeGreaterThanOrEqual(44)
+      expect(bounds?.x).toBeGreaterThanOrEqual(0)
+      expect((bounds?.x ?? 0) + (bounds?.width ?? 0)).toBeLessThanOrEqual(width)
+    }
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBe(width)
+  }
+})
+
 test('documents the package and runs the address demo', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1 })).toContainText(
